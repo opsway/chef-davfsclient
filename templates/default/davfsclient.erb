@@ -1,0 +1,38 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          davfsclient
+# Required-Start:    $local_fs $networking
+# Required-Stop:
+# X-Start-Before:    apache
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Provide limited super user privileges to specific users
+# Description: Provide limited super user privileges to specific users.
+### END INIT INFO
+
+N=/etc/init.d/davfsclient
+
+set -e
+
+case "$1" in
+  start)
+        <% @dirs.each do |dirname,dirattr| %>
+        /usr/sbin/mount.davfs <%= dirattr[:remote] %> <%= dirattr[:local] %>
+        <% end %>
+        ;;
+  stop)
+        <% @dirs.each do |dirname,dirattr| %>
+        /usr/sbin/umount.davfs <%= dirattr[:local] %>
+        <% end %>
+        ;;
+  stop|reload|restart|force-reload)
+        ;;
+  *)
+        echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+
