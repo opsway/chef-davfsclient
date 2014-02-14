@@ -27,12 +27,23 @@ end
     end
   end
 
+  mount_options = []
+  # allow another user to own the mount
+  if dirattr[:uid]
+    mount_options << "uid=#{dirattr[:uid]}"
+  end
+  if dirattr[:gid]
+    mount_options << "gid=#{dirattr[:gid]}"
+  end
+  mount_options << "defaults"
+  mount_options << "_netdev"
+
   mount "#{dirattr[:local]}" do
     not_if "grep -e \"#{dirattr[:local]}\" /proc/mounts"
     device "#{dirattr[:remote]}"
     fstype "davfs" 
     action [:mount, :enable]  
-    options "defaults,_netdev"
+    options mount_options.join(",")
     dump 0
     pass 0
     retries 5
